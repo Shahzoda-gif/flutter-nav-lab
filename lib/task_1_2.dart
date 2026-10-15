@@ -56,7 +56,7 @@ class ScreenC extends StatelessWidget {
       appBar: AppBar(title: const Text('Screen C'), backgroundColor: Colors.orange),
       body: Center(
         child: ElevatedButton(
-          onPressed: () => Navigator.pop(context), // Goes back to B
+          onPressed: () => Navigator.pop(context), 
           child: const Text('Back to B'),
         ),
       ),

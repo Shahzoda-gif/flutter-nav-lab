@@ -31,7 +31,6 @@ class StepScreen extends StatelessWidget {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
                 onPressed: () {
-                  // This pops everything until it hits the very first route (Step 1)
                   Navigator.popUntil(context, (route) => route.isFirst);
                 },
                 child: const Text('Finish (Back to Step 1)'),

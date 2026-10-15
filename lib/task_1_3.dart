@@ -12,7 +12,6 @@ class LoginScreen extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            // Replaces Login with Home completely
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -33,7 +32,6 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home Screen'),
-        // Notice there is no back arrow here because login was replaced!
       ),
       body: const Center(
         child: Text('You cannot go back to login screen!'),
