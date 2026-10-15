@@ -1,42 +1,43 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const MaterialApp(home: LoginScreen()));
+void main() => runApp(const MaterialApp(home: StepScreen(stepNumber: 1)));
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class StepScreen extends StatelessWidget {
+  final int stepNumber;
+  const StepScreen({super.key, required this.stepNumber});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login Screen')),
+      appBar: AppBar(title: Text('Step $stepNumber')),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // Replaces Login with Home completely
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-            );
-          },
-          child: const Text('Sign in'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (stepNumber < 4)
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StepScreen(stepNumber: stepNumber + 1),
+                    ),
+                  );
+                },
+                child: Text('Go to Step ${stepNumber + 1}'),
+              ),
+            const SizedBox(height: 16),
+            if (stepNumber == 4)
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                onPressed: () {
+                  // This pops everything until it hits the very first route (Step 1)
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                },
+                child: const Text('Finish (Back to Step 1)'),
+              ),
+          ],
         ),
-      ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home Screen'),
-        // Notice there is no back arrow here because login was replaced!
-      ),
-      body: const Center(
-        child: Text('You cannot go back to login screen!'),
       ),
     );
   }
