@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(const MaterialApp(home: ScreenA()));
 
+
 class ScreenA extends StatelessWidget {
   const ScreenA({super.key});
 
