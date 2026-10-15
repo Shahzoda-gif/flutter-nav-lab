@@ -1,64 +1,42 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const MaterialApp(home: ScreenA()));
+void main() => runApp(const MaterialApp(home: LoginScreen()));
 
-
-class ScreenA extends StatelessWidget {
-  const ScreenA({super.key});
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Screen A'), backgroundColor: Colors.blue),
+      appBar: AppBar(title: const Text('Login Screen')),
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            Navigator.push(
+            // Replaces Login with Home completely
+            Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const ScreenB()),
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
           },
-          child: const Text('Next to B'),
+          child: const Text('Sign in'),
         ),
       ),
     );
   }
 }
 
-class ScreenB extends StatelessWidget {
-  const ScreenB({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Screen B'), backgroundColor: Colors.green),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ScreenC()),
-            );
-          },
-          child: const Text('Next to C'),
-        ),
+      appBar: AppBar(
+        title: const Text('Home Screen'),
+        // Notice there is no back arrow here because login was replaced!
       ),
-    );
-  }
-}
-
-class ScreenC extends StatelessWidget {
-  const ScreenC({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Screen C'), backgroundColor: Colors.orange),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () => Navigator.pop(context), // Goes back to B
-          child: const Text('Back to B'),
-        ),
+      body: const Center(
+        child: Text('You cannot go back to login screen!'),
       ),
     );
   }
