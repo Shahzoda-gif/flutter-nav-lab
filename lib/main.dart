@@ -1,81 +1,54 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    initialRoute: '/',
-    routes: {
-      '/': (context) => const HomeRouteScreen(),
-    },
-    onGenerateRoute: (settings) {
-      if (settings.name!.startsWith('/greet/')) {
-        final uri = Uri.parse(settings.name!);
-        final pathSegments = uri.pathSegments;
-        
-        if (pathSegments.length > 1) {
-          final String name = pathSegments[1];
-          return MaterialPageRoute(
-            builder: (context) => GreetingDetailScreen(name: name),
-            settings: settings,
-          );
-        }
-      }
-      return null;
-    },
-  ));
-}
+void main() => runApp(const MaterialApp(home: HomeScreen()));
 
-class HomeRouteScreen extends StatelessWidget {
-  const HomeRouteScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Dynamic Routes (onGenerateRoute)')),
+      appBar: AppBar(title: const Text('Home - Slide Transition')),
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Click a button to test dynamic routing:',
-              style: TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, '/greet/Alice'),
-              child: const Text('Greet Alice (/greet/Alice)'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, '/greet/Bob'),
-              child: const Text('Greet Bob (/greet/Bob)'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, '/greet/Shahzoda'),
-              child: const Text('Greet Shahzoda (/greet/Shahzoda)'),
-            ),
-          ],
+        child: ElevatedButton(
+          child: const Text('Open with slide from right'),
+          onPressed: () {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                transitionDuration: const Duration(milliseconds: 400),
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const DetailsScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                },
+              ),
+            );
+          },
         ),
       ),
     );
   }
 }
 
-class GreetingDetailScreen extends StatelessWidget {
-  final String name;
-
-  const GreetingDetailScreen({super.key, required this.name});
+class DetailsScreen extends StatelessWidget {
+  const DetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Greeting for $name')),
-      body: Center(
+      appBar: AppBar(title: const Text('Details')),
+      body: const Center(
         child: Text(
-          'Hello, $name! Welcome via dynamic onGenerateRoute.',
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
+          'I slid in from the right!',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
       ),
     );
