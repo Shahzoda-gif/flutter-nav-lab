@@ -1,18 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+class Product {
+  final String name;
+  final double price;
+
+  const Product(this.name, this.price);
+}
+
+final List<Product> products = [
+  const Product('Laptop', 999.0),
+  const Product('Phone', 599.5),
+  const Product('Headphones', 79.9),
+];
+
 final GoRouter _router = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const HomeScreen(),
+      builder: (context, state) => const ProductListScreen(),
     ),
     GoRoute(
-      path: '/product/:id',
+      path: '/product-details',
       builder: (context, state) {
-        final String? productId = state.pathParameters['id'];
-        return ProductScreen(productId: productId ?? 'Unknown');
+        final Product product = state.extra as Product;
+        return ProductScreen(product: product);
       },
     ),
   ],
@@ -32,61 +45,54 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class ProductListScreen extends StatelessWidget {
+  const ProductListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('GoRouter Home - Path Parameters')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Select a Product to view:',
-              style: TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => context.push('/product/1'),
-              child: const Text('Product 1'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => context.push('/product/2'),
-              child: const Text('Product 2'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => context.push('/product/3'),
-              child: const Text('Product 3'),
-            ),
-          ],
-        ),
+      appBar: AppBar(title: const Text('Products (go_router extra)')),
+      body: ListView.builder(
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          final p = products[index];
+          return ListTile(
+            title: Text(p.name),
+            subtitle: Text('\$${p.price}'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              context.push('/product-details', extra: p);
+            },
+          );
+        },
       ),
     );
   }
 }
 
 class ProductScreen extends StatelessWidget {
-  final String productId;
+  final Product product;
 
-  const ProductScreen({super.key, required this.productId});
+  const ProductScreen({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Product #$productId')),
+      appBar: AppBar(title: Text(product.name)),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Product #$productId',
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blue),
+              product.name,
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
+            Text(
+              'Price: \$${product.price}',
+              style: const TextStyle(fontSize: 22, color: Colors.green),
+            ),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.pop(),
               child: const Text('Go Back'),
