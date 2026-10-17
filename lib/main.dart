@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class AppRoutes {
   static const home = '/';
   static const profile = '/profile';
+  static const messages = '/messages';
+  static const about = '/about';
 }
 
 void main() {
@@ -20,9 +22,62 @@ class MyApp extends StatelessWidget {
       routes: {
         AppRoutes.home: (context) => const HomeScreen(),
         AppRoutes.profile: (context) => const ProfileScreen(),
+        AppRoutes.messages: (context) => const MessagesScreen(),
+        AppRoutes.about: (context) => const AboutScreen(),
       },
-      onUnknownRoute: (settings) => MaterialPageRoute(
-        builder: (context) => const NotFoundScreen(),
+    );
+  }
+}
+
+class AppDrawer extends StatelessWidget {
+  const AppDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(color: Colors.blue),
+            child: Text(
+              'Navigation Menu',
+              style: TextStyle(color: Colors.white, fontSize: 24),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.home),
+            title: const Text('Home'),
+            onTap: () {
+              Navigator.pop(context); 
+              Navigator.pushReplacementNamed(context, AppRoutes.home);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Profile'),
+            onTap: () {
+              Navigator.pop(context); 
+              Navigator.pushReplacementNamed(context, AppRoutes.profile);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.message),
+            title: const Text('Messages'),
+            onTap: () {
+              Navigator.pop(context); 
+              Navigator.pushReplacementNamed(context, AppRoutes.messages);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.info),
+            title: const Text('About'),
+            onTap: () {
+              Navigator.pop(context); 
+              Navigator.pushReplacementNamed(context, AppRoutes.about);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -35,23 +90,8 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Home')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, AppRoutes.profile),
-              child: const Text('Go to Profile'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-              onPressed: () => Navigator.pushNamed(context, '/does-not-exist'),
-              child: const Text('Trigger 404 (Does Not Exist)'),
-            ),
-          ],
-        ),
-      ),
+      drawer: const AppDrawer(),
+      body: const Center(child: Text('Welcome to Home! Open the drawer to navigate.')),
     );
   }
 }
@@ -63,36 +103,34 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
-      body: const Center(child: Text('Welcome to Profile!')),
+      drawer: const AppDrawer(),
+      body: const Center(child: Text('Welcome to Profile Screen!')),
     );
   }
 }
 
-class NotFoundScreen extends StatelessWidget {
-  const NotFoundScreen({super.key});
+class MessagesScreen extends StatelessWidget {
+  const MessagesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Error 404')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
-            const SizedBox(height: 16),
-            const Text(
-              'Page not found!',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Go Back Home'),
-            ),
-          ],
-        ),
-      ),
+      appBar: AppBar(title: const Text('Messages')),
+      drawer: const AppDrawer(),
+      body: const Center(child: Text('Welcome to Messages Screen!')),
+    );
+  }
+}
+
+class AboutScreen extends StatelessWidget {
+  const AboutScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('About')),
+      drawer: const AppDrawer(),
+      body: const Center(child: Text('Welcome to About Screen!')),
     );
   }
 }
