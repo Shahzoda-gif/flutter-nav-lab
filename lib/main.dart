@@ -1,100 +1,80 @@
 import 'package:flutter/material.dart';
 
-class AppRoutes {
-  static const login = '/login';
-  static const home = '/home';
-  static const profile = '/profile';
-}
-
 void main() {
-  runApp(const MyApp());
+  runApp(const MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: ScreenOne(),
+  ));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ScreenOne extends StatefulWidget {
+  const ScreenOne({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.login,
-      routes: {
-        AppRoutes.login: (context) => const LoginScreen(),
-        AppRoutes.home: (context) => const HomeScreen(),
-        AppRoutes.profile: (context) => const ProfileScreen(),
-      },
-    );
-  }
+  State<ScreenOne> createState() => _ScreenOneState();
 }
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class _ScreenOneState extends State<ScreenOne> {
+  final TextEditingController _nameController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, AppRoutes.home);
-          },
-          child: const Text('Sign In'),
-        ),
-      ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: Center(
+      appBar: AppBar(title: const Text('Enter Your Name')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Welcome to Home!'),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, AppRoutes.profile),
-              child: const Text('Go to Profile'),
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Your Name',
+                hintText: 'Enter your name here',
+              ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('User Profile Details'),
             const SizedBox(height: 20),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  AppRoutes.login,
-                  (route) => false, 
-                );
+                final name = _nameController.text.trim();
+                if (name.isNotEmpty) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ScreenTwo(userName: name),
+                    ),
+                  );
+                }
               },
-              child: const Text('Log out', style: TextStyle(color: Colors.white)),
+              child: const Text('Greet'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ScreenTwo extends StatelessWidget {
+  final String userName;
+
+  const ScreenTwo({super.key, required this.userName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Greeting Screen')),
+      body: Center(
+        child: Text(
+          'Hello, $userName!',
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
       ),
     );
