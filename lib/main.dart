@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 class AppRoutes {
   static const home = '/';
   static const profile = '/profile';
-  static const messages = '/messages';
-  static const about = '/about';
 }
 
 void main() {
@@ -22,9 +20,10 @@ class MyApp extends StatelessWidget {
       routes: {
         AppRoutes.home: (context) => const HomeScreen(),
         AppRoutes.profile: (context) => const ProfileScreen(),
-        AppRoutes.messages: (context) => const MessagesScreen(),
-        AppRoutes.about: (context) => const AboutScreen(),
       },
+      onUnknownRoute: (settings) => MaterialPageRoute(
+        builder: (context) => const NotFoundScreen(),
+      ),
     );
   }
 }
@@ -36,27 +35,22 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Home')),
-      body: ListView(
-        children: [
-          ListTile(
-            leading: const Icon(Icons.person, color: Colors.blue),
-            title: const Text('Profile'),
-            subtitle: const Text('Go to profile screen'),
-            onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
-          ),
-          ListTile(
-            leading: const Icon(Icons.message, color: Colors.green),
-            title: const Text('Messages'),
-            subtitle: const Text('Go to messages screen'),
-            onTap: () => Navigator.pushNamed(context, AppRoutes.messages),
-          ),
-          ListTile(
-            leading: const Icon(Icons.info, color: Colors.orange),
-            title: const Text('About'),
-            subtitle: const Text('Go to about screen'),
-            onTap: () => Navigator.pushNamed(context, AppRoutes.about),
-          ),
-        ],
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, AppRoutes.profile),
+              child: const Text('Go to Profile'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              onPressed: () => Navigator.pushNamed(context, '/does-not-exist'),
+              child: const Text('Trigger 404 (Does Not Exist)'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -69,36 +63,35 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
-      body: const Center(
-        child: Text('Welcome to Profile Screen!', style: TextStyle(fontSize: 20)),
-      ),
+      body: const Center(child: Text('Welcome to Profile!')),
     );
   }
 }
 
-class MessagesScreen extends StatelessWidget {
-  const MessagesScreen({super.key});
+class NotFoundScreen extends StatelessWidget {
+  const NotFoundScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Messages')),
-      body: const Center(
-        child: Text('Welcome to Messages Screen!', style: TextStyle(fontSize: 20)),
-      ),
-    );
-  }
-}
-
-class AboutScreen extends StatelessWidget {
-  const AboutScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('About')),
-      body: const Center(
-        child: Text('Welcome to About Screen!', style: TextStyle(fontSize: 20)),
+      appBar: AppBar(title: const Text('Error 404')),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            const Text(
+              'Page not found!',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Go Back Home'),
+            ),
+          ],
+        ),
       ),
     );
   }
