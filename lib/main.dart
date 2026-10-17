@@ -1,6 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-void main() => runApp(const MaterialApp(home: HomeScreen()));
+final GoRouter _router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: '/product/:id',
+      builder: (context, state) {
+        final String? productId = state.pathParameters['id'];
+        return ProductScreen(productId: productId ?? 'Unknown');
+      },
+    ),
+  ],
+);
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      routerConfig: _router,
+    );
+  }
+}
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -8,52 +38,60 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home - Scale & Fade Transition')),
+      appBar: AppBar(title: const Text('GoRouter Home - Path Parameters')),
       body: Center(
-        child: ElevatedButton(
-          child: const Text('Open with scale and fade'),
-          onPressed: () {
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                transitionDuration: const Duration(milliseconds: 400),
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    const DetailsScreen(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  final scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-                    CurvedAnimation(parent: animation, curve: Curves.easeInOut),
-                  );
-
-                  return FadeTransition(
-                    opacity: animation,
-                    child: ScaleTransition(
-                      scale: scaleAnimation,
-                      child: child,
-                    ),
-                  );
-                },
-              ),
-            );
-          },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Select a Product to view:',
+              style: TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => context.push('/product/1'),
+              child: const Text('Product 1'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => context.push('/product/2'),
+              child: const Text('Product 2'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => context.push('/product/3'),
+              child: const Text('Product 3'),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class DetailsScreen extends StatelessWidget {
-  const DetailsScreen({super.key});
+class ProductScreen extends StatelessWidget {
+  final String productId;
+
+  const ProductScreen({super.key, required this.productId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Scale & Fade Details')),
-      body: const Center(
-        child: Text(
-          'I scaled up from 80% and faded in simultaneously!',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
+      appBar: AppBar(title: Text('Product #$productId')),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Product #$productId',
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blue),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => context.pop(),
+              child: const Text('Go Back'),
+            ),
+          ],
         ),
       ),
     );
