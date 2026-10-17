@@ -8,30 +8,29 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home - Sheet Animation')),
+      appBar: AppBar(title: const Text('Home - Scale & Fade Transition')),
       body: Center(
         child: ElevatedButton(
-          child: const Text('Open as a sheet'),
+          child: const Text('Open with scale and fade'),
           onPressed: () {
             Navigator.push(
               context,
               PageRouteBuilder(
-                transitionDuration: const Duration(milliseconds: 500),
+                transitionDuration: const Duration(milliseconds: 400),
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     const DetailsScreen(),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
-                  final curvedAnimation = CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeOut,
+                  final scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeInOut),
                   );
 
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0.0, 1.0),
-                      end: Offset.zero,
-                    ).animate(curvedAnimation),
-                    child: child,
+                  return FadeTransition(
+                    opacity: animation,
+                    child: ScaleTransition(
+                      scale: scaleAnimation,
+                      child: child,
+                    ),
                   );
                 },
               ),
@@ -49,11 +48,12 @@ class DetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sheet Details')),
+      appBar: AppBar(title: const Text('Scale & Fade Details')),
       body: const Center(
         child: Text(
-          'I slid in from the bottom like a sheet!',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          'I scaled up from 80% and faded in simultaneously!',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
         ),
       ),
     );
