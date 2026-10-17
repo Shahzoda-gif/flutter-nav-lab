@@ -1,69 +1,37 @@
 import 'package:flutter/material.dart';
 
-class User {
-  final String name;
-  final int age;
+class Product {
+  final String title;
+  final double price;
 
-  const User({required this.name, required this.age});
+  const Product({required this.title, required this.price});
 }
-
-final List<User> users = [
-  const User(name: 'Alice', age: 22),
-  const User(name: 'Bob', age: 25),
-  const User(name: 'Charlie', age: 20),
-  const User(name: 'Diana', age: 23),
-];
 
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     initialRoute: '/',
     routes: {
-      '/': (context) => const UserListScreen(),
-      '/user-detail': (context) => const UserDetailScreen(),
+      '/': (context) => const ProductHome(),
+      '/edit-product': (context) => const EditProductScreen(),
     },
   ));
 }
 
-class UserListScreen extends StatelessWidget {
-  const UserListScreen({super.key});
+class ProductHome extends StatefulWidget {
+  const ProductHome({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Users List')),
-      body: ListView.builder(
-        itemCount: users.length,
-        itemBuilder: (context, index) {
-          final user = users[index];
-          return ListTile(
-            leading: CircleAvatar(child: Text(user.name[0])),
-            title: Text(user.name),
-            subtitle: Text('Age: ${user.age}'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/user-detail',
-                arguments: user,
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
+  State<ProductHome> createState() => _ProductHomeState();
 }
 
-class UserDetailScreen extends StatelessWidget {
-  const UserDetailScreen({super.key});
+class _ProductHomeState extends State<ProductHome> {
+  Product _currentProduct = const Product(title: 'Flutter Book', price: 29.99);
 
   @override
   Widget build(BuildContext context) {
-    final User user = ModalRoute.of(context)!.settings.arguments as User;
-
     return Scaffold(
-      appBar: AppBar(title: Text('${user.name} Details')),
+      appBar: AppBar(title: const Text('Product Details')),
       body: Center(
         child: Card(
           elevation: 4,
@@ -73,23 +41,107 @@ class UserDetailScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircleAvatar(
-                  radius: 40,
-                  child: Text(user.name[0], style: const TextStyle(fontSize: 32)),
-                ),
-                const SizedBox(height: 20),
                 Text(
-                  'Name: ${user.name}',
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  _currentProduct.title,
+                  style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Age: ${user.age}',
-                  style: const TextStyle(fontSize: 20, color: Colors.grey),
+                  '\$${_currentProduct.price.toStringAsFixed(2)}',
+                  style: const TextStyle(fontSize: 22, color: Colors.green),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () async {
+                    final Product? updatedProduct = await Navigator.pushNamed<Product>(
+                      context,
+                      '/edit-product',
+                      arguments: _currentProduct,
+                    );
+
+                    if (updatedProduct != null) {
+                      setState(() {
+                        _currentProduct = updatedProduct;
+                      });
+                    }
+                  },
+                  child: const Text('Edit Product'),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class EditProductScreen extends StatefulWidget {
+  const EditProductScreen({super.key});
+
+  @override
+  State<EditProductScreen> createState() => _EditProductScreenState();
+}
+
+class _EditProductScreenState extends State<EditProductScreen> {
+  late TextEditingController _titleController;
+  late TextEditingController _priceController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final Product product = ModalRoute.of(context)!.settings.arguments as Product;
+    
+    _titleController = TextEditingController(text: product.title);
+    _priceController = TextEditingController(text: product.price.toString());
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _priceController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Edit Product')),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: 'Product Title',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _priceController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Price',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              onPressed: () {
+                final String title = _titleController.text.trim();
+                final double? price = double.tryParse(_priceController.text.trim());
+
+                if (title.isNotEmpty && price != null) {
+                  final updatedProduct = Product(title: title, price: price);
+                  Navigator.pop(context, updatedProduct);
+                }
+              },
+              child: const Text('Save', style: TextStyle(color: Colors.white)),
+            ),
+          ],
         ),
       ),
     );
