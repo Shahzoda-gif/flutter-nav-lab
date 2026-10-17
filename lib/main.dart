@@ -1,78 +1,95 @@
 import 'package:flutter/material.dart';
 
+class User {
+  final String name;
+  final int age;
+
+  const User({required this.name, required this.age});
+}
+
+final List<User> users = [
+  const User(name: 'Alice', age: 22),
+  const User(name: 'Bob', age: 25),
+  const User(name: 'Charlie', age: 20),
+  const User(name: 'Diana', age: 23),
+];
+
 void main() {
-  runApp( MaterialApp(
+  runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     initialRoute: '/',
     routes: {
-      '/': (context) => const HomeScreen(),
-      '/square': (context) => const SquareScreen(),
+      '/': (context) => const UserListScreen(),
+      '/user-detail': (context) => const UserDetailScreen(),
     },
   ));
 }
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+
+class UserListScreen extends StatelessWidget {
+  const UserListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home - Send Number')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Select a number to pass:', style: TextStyle(fontSize: 18)),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/square', arguments: 1),
-                  child: const Text('1'),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/square', arguments: 2),
-                  child: const Text('2'),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/square', arguments: 3),
-                  child: const Text('3'),
-                ),
-              ],
-            ),
-          ],
-        ),
+      appBar: AppBar(title: const Text('Users List')),
+      body: ListView.builder(
+        itemCount: users.length,
+        itemBuilder: (context, index) {
+          final user = users[index];
+          return ListTile(
+            leading: CircleAvatar(child: Text(user.name[0])),
+            title: Text(user.name),
+            subtitle: Text('Age: ${user.age}'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/user-detail',
+                arguments: user,
+              );
+            },
+          );
+        },
       ),
     );
   }
 }
 
-class SquareScreen extends StatelessWidget {
-  const SquareScreen({super.key});
+class UserDetailScreen extends StatelessWidget {
+  const UserDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final int number = ModalRoute.of(context)!.settings.arguments as int;
-    final int squaredValue = number * number;
+    final User user = ModalRoute.of(context)!.settings.arguments as User;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Square Result')),
+      appBar: AppBar(title: Text('${user.name} Details')),
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Number: $number',
-              style: const TextStyle(fontSize: 24),
+        child: Card(
+          elevation: 4,
+          margin: const EdgeInsets.all(24),
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  radius: 40,
+                  child: Text(user.name[0], style: const TextStyle(fontSize: 32)),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Name: ${user.name}',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Age: ${user.age}',
+                  style: const TextStyle(fontSize: 20, color: Colors.grey),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Square: $squaredValue',
-              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.blue),
-            ),
-          ],
+          ),
         ),
       ),
     );
