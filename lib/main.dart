@@ -1,59 +1,104 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const MaterialApp(home: RootScreen()));
+class AppRoutes {
+  static const home = '/';
+  static const profile = '/profile';
+  static const messages = '/messages';
+  static const about = '/about';
+}
 
-class BackOrExitButton extends StatelessWidget {
-  const BackOrExitButton({super.key});
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final bool canPop = Navigator.canPop(context);
-
-    return ElevatedButton(
-      onPressed: canPop ? () => Navigator.pop(context) : null, 
-      child: Text(canPop ? 'Back' : 'Nothing to go back to'),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      initialRoute: AppRoutes.home,
+      routes: {
+        AppRoutes.home: (context) => const HomeScreen(),
+        AppRoutes.profile: (context) => const ProfileScreen(),
+        AppRoutes.messages: (context) => const MessagesScreen(),
+        AppRoutes.about: (context) => const AboutScreen(),
+      },
     );
   }
 }
 
-class RootScreen extends StatelessWidget {
-  const RootScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Root Screen')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const BackOrExitButton(), 
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const PushedScreen()),
-                );
-              },
-              child: const Text('Open Pushed Screen'),
-            ),
-          ],
-        ),
+      appBar: AppBar(title: const Text('Home')),
+      body: ListView(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.person, color: Colors.blue),
+            title: const Text('Profile'),
+            subtitle: const Text('Go to profile screen'),
+            onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
+          ),
+          ListTile(
+            leading: const Icon(Icons.message, color: Colors.green),
+            title: const Text('Messages'),
+            subtitle: const Text('Go to messages screen'),
+            onTap: () => Navigator.pushNamed(context, AppRoutes.messages),
+          ),
+          ListTile(
+            leading: const Icon(Icons.info, color: Colors.orange),
+            title: const Text('About'),
+            subtitle: const Text('Go to about screen'),
+            onTap: () => Navigator.pushNamed(context, AppRoutes.about),
+          ),
+        ],
       ),
     );
   }
 }
 
-class PushedScreen extends StatelessWidget {
-  const PushedScreen({super.key});
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Pushed Screen')),
+      appBar: AppBar(title: const Text('Profile')),
       body: const Center(
-        child: BackOrExitButton(), 
+        child: Text('Welcome to Profile Screen!', style: TextStyle(fontSize: 20)),
+      ),
+    );
+  }
+}
+
+class MessagesScreen extends StatelessWidget {
+  const MessagesScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Messages')),
+      body: const Center(
+        child: Text('Welcome to Messages Screen!', style: TextStyle(fontSize: 20)),
+      ),
+    );
+  }
+}
+
+class AboutScreen extends StatelessWidget {
+  const AboutScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('About')),
+      body: const Center(
+        child: Text('Welcome to About Screen!', style: TextStyle(fontSize: 20)),
       ),
     );
   }
