@@ -1,27 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+Page<dynamic> buildSlideTransitionPage({
+  required LocalKey key,
+  required Widget child,
+}) {
+  return CustomTransitionPage(
+    key: key,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final slideAnimation = Tween<Offset>(
+        begin: const Offset(1.0, 0.0),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeInOut,
+      ));
+
+      return SlideTransition(
+        position: slideAnimation,
+        child: FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
 final GoRouter _router = GoRouter(
   initialLocation: '/',
-  errorBuilder: (context, state) => const NotFoundScreen(),
   routes: [
     GoRoute(
       path: '/',
-      name: 'home',
       builder: (context, state) => const HomeScreen(),
     ),
     GoRoute(
-      path: '/settings',
-      name: 'settings',
-      builder: (context, state) => const SettingsScreen(),
-    ),
-    GoRoute(
-      path: '/item/:id',
-      name: 'item',
-      builder: (context, state) {
-        final String id = state.pathParameters['id'] ?? '0';
-        return ItemScreen(itemId: id);
-      },
+      path: '/details',
+      pageBuilder: (context, state) => buildSlideTransitionPage(
+        key: state.pageKey,
+        child: const DetailsScreen(),
+      ),
     ),
   ],
 );
@@ -46,90 +65,37 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('go_router Named Routes')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ElevatedButton(
-              onPressed: () => context.goNamed('settings'),
-              child: const Text('Go to Settings'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => context.goNamed(
-                'item',
-                pathParameters: {'id': '42'},
-              ),
-              child: const Text('Go to Item #42'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => context.go('/does-not-exist'),
-              child: const Text('Test 404 Not Found Page'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: const Text('go_router Custom Transitions')),
       body: Center(
         child: ElevatedButton(
-          onPressed: () => context.goNamed('home'),
-          child: const Text('Back to Home'),
+          onPressed: () => context.push('/details'),
+          child: const Text('Open Details with Transition'),
         ),
       ),
     );
   }
 }
 
-class ItemScreen extends StatelessWidget {
-  final String itemId;
-
-  const ItemScreen({super.key, required this.itemId});
+class DetailsScreen extends StatelessWidget {
+  const DetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Item Details ($itemId)')),
-      body: Center(
-        child: Text(
-          'Viewing Item ID: $itemId',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-}
-
-class NotFoundScreen extends StatelessWidget {
-  const NotFoundScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Error 404')),
+      appBar: AppBar(title: const Text('Animated Details Screen')),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              '404 - Page Not Found!',
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.red),
+              'I animated smoothly using CustomTransitionPage!',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => context.goNamed('home'),
-              child: const Text('Go Back Home'),
+              onPressed: () => context.pop(),
+              child: const Text('Go Back'),
             ),
           ],
         ),
