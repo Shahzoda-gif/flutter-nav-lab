@@ -1,147 +1,81 @@
 import 'package:flutter/material.dart';
 
-class Product {
-  final String title;
-  final double price;
-
-  const Product({required this.title, required this.price});
-}
-
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     initialRoute: '/',
     routes: {
-      '/': (context) => const ProductHome(),
-      '/edit-product': (context) => const EditProductScreen(),
+      '/': (context) => const HomeRouteScreen(),
+    },
+    onGenerateRoute: (settings) {
+      if (settings.name!.startsWith('/greet/')) {
+        final uri = Uri.parse(settings.name!);
+        final pathSegments = uri.pathSegments;
+        
+        if (pathSegments.length > 1) {
+          final String name = pathSegments[1];
+          return MaterialPageRoute(
+            builder: (context) => GreetingDetailScreen(name: name),
+            settings: settings,
+          );
+        }
+      }
+      return null;
     },
   ));
 }
 
-class ProductHome extends StatefulWidget {
-  const ProductHome({super.key});
-
-  @override
-  State<ProductHome> createState() => _ProductHomeState();
-}
-
-class _ProductHomeState extends State<ProductHome> {
-  Product _currentProduct = const Product(title: 'Flutter Book', price: 29.99);
+class HomeRouteScreen extends StatelessWidget {
+  const HomeRouteScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Product Details')),
+      appBar: AppBar(title: const Text('Dynamic Routes (onGenerateRoute)')),
       body: Center(
-        child: Card(
-          elevation: 4,
-          margin: const EdgeInsets.all(24),
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _currentProduct.title,
-                  style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  '\$${_currentProduct.price.toStringAsFixed(2)}',
-                  style: const TextStyle(fontSize: 22, color: Colors.green),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () async {
-                    final Product? updatedProduct = await Navigator.pushNamed<Product>(
-                      context,
-                      '/edit-product',
-                      arguments: _currentProduct,
-                    );
-
-                    if (updatedProduct != null) {
-                      setState(() {
-                        _currentProduct = updatedProduct;
-                      });
-                    }
-                  },
-                  child: const Text('Edit Product'),
-                ),
-              ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Click a button to test dynamic routing:',
+              style: TextStyle(fontSize: 18),
             ),
-          ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/greet/Alice'),
+              child: const Text('Greet Alice (/greet/Alice)'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/greet/Bob'),
+              child: const Text('Greet Bob (/greet/Bob)'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/greet/Shahzoda'),
+              child: const Text('Greet Shahzoda (/greet/Shahzoda)'),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class EditProductScreen extends StatefulWidget {
-  const EditProductScreen({super.key});
+class GreetingDetailScreen extends StatelessWidget {
+  final String name;
 
-  @override
-  State<EditProductScreen> createState() => _EditProductScreenState();
-}
-
-class _EditProductScreenState extends State<EditProductScreen> {
-  late TextEditingController _titleController;
-  late TextEditingController _priceController;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final Product product = ModalRoute.of(context)!.settings.arguments as Product;
-    
-    _titleController = TextEditingController(text: product.title);
-    _priceController = TextEditingController(text: product.price.toString());
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _priceController.dispose();
-    super.dispose();
-  }
+  const GreetingDetailScreen({super.key, required this.name});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Product')),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Product Title',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _priceController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Price',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-              onPressed: () {
-                final String title = _titleController.text.trim();
-                final double? price = double.tryParse(_priceController.text.trim());
-
-                if (title.isNotEmpty && price != null) {
-                  final updatedProduct = Product(title: title, price: price);
-                  Navigator.pop(context, updatedProduct);
-                }
-              },
-              child: const Text('Save', style: TextStyle(color: Colors.white)),
-            ),
-          ],
+      appBar: AppBar(title: Text('Greeting for $name')),
+      body: Center(
+        child: Text(
+          'Hello, $name! Welcome via dynamic onGenerateRoute.',
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
         ),
       ),
     );
