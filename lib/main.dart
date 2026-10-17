@@ -1,56 +1,47 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MaterialApp(
+  runApp( MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: ColorPickerHome(),
+    initialRoute: '/',
+    routes: {
+      '/': (context) => const HomeScreen(),
+      '/square': (context) => const SquareScreen(),
+    },
   ));
 }
-class ColorPickerHome extends StatefulWidget {
-  const ColorPickerHome({super.key});
 
-  @override
-  State<ColorPickerHome> createState() => _ColorPickerHomeState();
-}
-
-class _ColorPickerHomeState extends State<ColorPickerHome> {
-
-  Color _selectedColor = Colors.grey;
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Pick a Color (Result Back)')),
+      appBar: AppBar(title: const Text('Home - Send Number')),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                color: _selectedColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.black26, width: 2),
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () async {
-                final Color? returnedColor = await Navigator.push<Color>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ColorSelectionScreen(),
-                  ),
-                );
-
-                if (returnedColor != null) {
-                  setState(() {
-                    _selectedColor = returnedColor;
-                  });
-                }
-              },
-              child: const Text('Choose colour'),
+            const Text('Select a number to pass:', style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/square', arguments: 1),
+                  child: const Text('1'),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/square', arguments: 2),
+                  child: const Text('2'),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/square', arguments: 3),
+                  child: const Text('3'),
+                ),
+              ],
             ),
           ],
         ),
@@ -59,39 +50,28 @@ class _ColorPickerHomeState extends State<ColorPickerHome> {
   }
 }
 
-class ColorSelectionScreen extends StatelessWidget {
-  const ColorSelectionScreen({super.key});
+class SquareScreen extends StatelessWidget {
+  const SquareScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final int number = ModalRoute.of(context)!.settings.arguments as int;
+    final int squaredValue = number * number;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Select a Color')),
+      appBar: AppBar(title: const Text('Square Result')),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              onPressed: () {
-                Navigator.pop(context, Colors.red);
-              },
-              child: const Text('Red', style: TextStyle(color: Colors.white)),
+            Text(
+              'Number: $number',
+              style: const TextStyle(fontSize: 24),
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              onPressed: () {
-                Navigator.pop(context, Colors.green);
-              },
-              child: const Text('Green', style: TextStyle(color: Colors.white)),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-              onPressed: () {
-                Navigator.pop(context, Colors.blue);
-              },
-              child: const Text('Blue', style: TextStyle(color: Colors.white)),
+            const SizedBox(height: 12),
+            Text(
+              'Square: $squaredValue',
+              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.blue),
             ),
           ],
         ),
