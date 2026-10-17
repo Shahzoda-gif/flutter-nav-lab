@@ -1,31 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class Product {
-  final String name;
-  final double price;
-
-  const Product(this.name, this.price);
-}
-
-final List<Product> products = [
-  const Product('Laptop', 999.0),
-  const Product('Phone', 599.5),
-  const Product('Headphones', 79.9),
-];
-
 final GoRouter _router = GoRouter(
   initialLocation: '/',
+  errorBuilder: (context, state) => const NotFoundScreen(),
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const ProductListScreen(),
+      name: 'home',
+      builder: (context, state) => const HomeScreen(),
     ),
     GoRoute(
-      path: '/product-details',
+      path: '/settings',
+      name: 'settings',
+      builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/item/:id',
+      name: 'item',
       builder: (context, state) {
-        final Product product = state.extra as Product;
-        return ProductScreen(product: product);
+        final String id = state.pathParameters['id'] ?? '0';
+        return ItemScreen(itemId: id);
       },
     ),
   ],
@@ -45,57 +40,96 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class ProductListScreen extends StatelessWidget {
-  const ProductListScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Products (go_router extra)')),
-      body: ListView.builder(
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final p = products[index];
-          return ListTile(
-            title: Text(p.name),
-            subtitle: Text('\$${p.price}'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              context.push('/product-details', extra: p);
-            },
-          );
-        },
+      appBar: AppBar(title: const Text('go_router Named Routes')),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: () => context.goNamed('settings'),
+              child: const Text('Go to Settings'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => context.goNamed(
+                'item',
+                pathParameters: {'id': '42'},
+              ),
+              child: const Text('Go to Item #42'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => context.go('/does-not-exist'),
+              child: const Text('Test 404 Not Found Page'),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class ProductScreen extends StatelessWidget {
-  final Product product;
-
-  const ProductScreen({super.key, required this.product});
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(product.name)),
+      appBar: AppBar(title: const Text('Settings')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () => context.goNamed('home'),
+          child: const Text('Back to Home'),
+        ),
+      ),
+    );
+  }
+}
+
+class ItemScreen extends StatelessWidget {
+  final String itemId;
+
+  const ItemScreen({super.key, required this.itemId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Item Details ($itemId)')),
+      body: Center(
+        child: Text(
+          'Viewing Item ID: $itemId',
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+}
+
+class NotFoundScreen extends StatelessWidget {
+  const NotFoundScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Error 404')),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              product.name,
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            const Text(
+              '404 - Page Not Found!',
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.red),
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Price: \$${product.price}',
-              style: const TextStyle(fontSize: 22, color: Colors.green),
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => context.pop(),
-              child: const Text('Go Back'),
+              onPressed: () => context.goNamed('home'),
+              child: const Text('Go Back Home'),
             ),
           ],
         ),
